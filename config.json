@@ -20,8 +20,8 @@
   "settings": {
     "addr": true,
     "phone": true,
-    "result": true,
-    "answer": true,
+    "result": false,
+    "answer": false,
     "finishMsg": ""
   }
 }
