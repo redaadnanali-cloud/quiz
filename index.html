@@ -305,6 +305,34 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
       <textarea id="finish-msg" placeholder="مثال: جزاكم الله خيراً على مشاركتكم..." style="min-height:70px"></textarea>
     </div>
 
+    <!-- Thank you title styling -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="font-size:.82rem;color:var(--gold);font-weight:700;margin-bottom:10px">✏️ تخصيص عبارة "شكراً على مشاركتك"</div>
+      <div class="field" style="margin-bottom:10px">
+        <label>النص</label>
+        <input type="text" id="thankyou-text" value="شكراً على مشاركتك!" placeholder="شكراً على مشاركتك!">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px">لون العبارة</label>
+          <input type="color" id="thankyou-color" value="#ffffff" style="width:100%;height:36px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--s2)">
+        </div>
+        <div>
+          <label style="font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px">الإيموجي</label>
+          <select id="thankyou-icon" style="font-size:1.2rem;text-align:center">
+            <option value="🙏">🙏</option>
+            <option value="🌟">🌟</option>
+            <option value="💚">💚</option>
+            <option value="🎉">🎉</option>
+            <option value="📖">📖</option>
+            <option value="🕌">🕌</option>
+            <option value="✨">✨</option>
+            <option value="🏆">🏆</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <!-- Message Styling -->
     <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">
       <div style="font-size:.82rem;color:var(--gold);font-weight:700;margin-bottom:12px">🎨 تخصيص رسالة الانتهاء</div>
@@ -316,6 +344,7 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
         <div>
           <label style="font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px">لون الخلفية</label>
           <input type="color" id="msg-bg" value="#1a1a2e" oninput="previewMsg()" style="width:100%;height:36px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--s2)">
+          <button onclick="clearMsgBg()" style="margin-top:4px;background:transparent;border:1px dashed var(--border);color:var(--muted);border-radius:8px;padding:4px 10px;font-family:inherit;font-size:.75rem;cursor:pointer;width:100%">✕ بدون خلفية</button>
         </div>
       </div>
       <div style="margin-bottom:10px">
@@ -432,7 +461,13 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
     <!-- Music - URL based -->
     <div style="margin-bottom:16px">
       <div style="font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:8px">🎵 موسيقى الأسئلة</div>
-      <div style="font-size:.78rem;color:var(--muted);margin-bottom:8px">اختر موسيقى جاهزة أو أدخل رابط مباشر (MP3 من الإنترنت)</div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:8px">اختر موسيقى جاهزة أو ارفع من جهازك</div>
+      <!-- Upload from device -->
+      <div class="img-zone" style="margin-bottom:10px;padding:12px">
+        <input type="file" accept="audio/*,video/*" onchange="loadMusicFromDevice(this)">
+        <div style="font-size:.88rem">🎵 رفع موسيقى من الجهاز (MP3/MP4/M4A)</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:3px" id="device-music-name">لم يُرفع ملف بعد</div>
+      </div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
         <button class="music-opt active" id="mo-0" onclick="selectMusic(0,'')">🔕 بدون موسيقى</button>
         <button class="music-opt" id="mo-1" onclick="selectMusic(1,'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')">🎵 موسيقى هادئة ١</button>
@@ -533,6 +568,19 @@ function selectClick(n){
 }
 
 // ===== MUSIC =====
+function loadMusicFromDevice(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    selectedMusicUrl=e.target.result;
+    // Deselect preset buttons
+    document.querySelectorAll('[id^="mo-"]').forEach(b=>b.classList.remove('active'));
+    document.getElementById('device-music-name').textContent='🎵 '+f.name;
+    if(musicAudio){musicAudio.pause();musicAudio=null;musicPlaying=false;}
+    showToast('تم تحميل الموسيقى ✅','ok');
+  };
+  r.readAsDataURL(f);
+}
 function selectMusic(idx,url){
   // idx: 0=none, 1=m1, 2=m2, 3=m3, -1=custom url
   selectedMusicUrl = idx>0 ? MUSIC_SRCS[idx] : (url||'');
@@ -593,6 +641,13 @@ function removeMsgImg(){
   if(prev)prev.style.display='none';
   previewMsg();
 }
+function clearMsgBg(){
+  const el=document.getElementById('msg-bg');
+  if(el)el.value='#1a1a2e'; // set to "transparent" marker
+  const msgEl=document.getElementById('res-msg');
+  if(msgEl)msgEl.style.background='transparent';
+  showToast('تم إزالة الخلفية','ok');
+}
 function previewMsg(){
   const msg=document.getElementById('finish-msg').value;
   const color=document.getElementById('msg-color').value;
@@ -623,13 +678,15 @@ function applyMsgStyle(s,msg){
   const el=document.getElementById('res-msg');
   if(!el)return;
   let content='';
-  if(s.imgSrc)content+=`<img src="${s.imgSrc}" style="max-width:100%;max-height:120px;border-radius:10px;margin-bottom:8px;object-fit:cover;display:block;margin-left:auto;margin-right:auto">`;
+  if(s&&s.imgSrc)content+=`<img src="${s.imgSrc}" style="max-width:100%;max-height:120px;border-radius:10px;margin-bottom:8px;object-fit:cover;display:block;margin-left:auto;margin-right:auto">`;
   if(msg)content+=`<span>${msg}</span>`;
   el.innerHTML=content||'';
-  el.style.color=s.color||'var(--muted)';
-  el.style.background=s.bg&&s.bg!=='#1a1a2e'?s.bg:'transparent';
-  el.style.fontFamily=s.font?`'${s.font}',sans-serif`:'inherit';
-  el.style.fontSize=(s.fontSize||16)+'px';
+  el.style.color=(s&&s.color)||'var(--muted)';
+  el.style.background=(s&&s.bg&&s.bg!=='#1a1a2e')?s.bg:'transparent';
+  el.style.fontFamily=(s&&s.font)?`'${s.font}',sans-serif`:'inherit';
+  el.style.fontSize=((s&&s.fontSize)||16)+'px';
+  el.style.padding=content?'12px 16px':'0';
+  el.style.borderRadius=content?'12px':'0';
 }
 
 function saveSettings(){
@@ -639,7 +696,10 @@ function saveSettings(){
     result:document.getElementById('s-result').checked,
     answer:document.getElementById('s-answer').checked,
     finishMsg:document.getElementById('finish-msg').value,
-    msgStyle:getMsgStyle()
+    msgStyle:getMsgStyle(),
+    thankyouText:document.getElementById('thankyou-text')?document.getElementById('thankyou-text').value:'شكراً على مشاركتك!',
+    thankyouColor:document.getElementById('thankyou-color')?document.getElementById('thankyou-color').value:'#ffffff',
+    thankyouIcon:document.getElementById('thankyou-icon')?document.getElementById('thankyou-icon').value:'🙏'
   };
   localStorage.setItem(STK,JSON.stringify(s));applyForm();showToast('تم حفظ الإعدادات ✅','ok');
 }
@@ -660,6 +720,11 @@ function applyToggles(){
       if(s.msgStyle.imgSrc){msgImgSrc=s.msgStyle.imgSrc;const prev=document.getElementById('msg-img-preview');const el=document.getElementById('msg-img-el');if(prev&&el){prev.style.display='block';el.src=s.msgStyle.imgSrc;}}
     }catch(e){}
   }
+  try{
+    if(s.thankyouText)document.getElementById('thankyou-text').value=s.thankyouText;
+    if(s.thankyouColor)document.getElementById('thankyou-color').value=s.thankyouColor;
+    if(s.thankyouIcon)document.getElementById('thankyou-icon').value=s.thankyouIcon;
+  }catch(e){}
 }
 
 // ===== THEMES =====
@@ -937,7 +1002,13 @@ function finishQuiz(){
   const sk=scores.filter(s=>!s||s.result==='skipped').length;
   const pct=Math.round(ok/quizCards.length*100);
   // Collect written answers
-  const writtenParts=scores.filter(s=>s&&s.type==='written'&&s.userAns&&s.userAns!=='—').map(s=>`${s.question}: ${s.userAns}`);
+  // Collect ALL written answers from scores
+  const writtenParts=[];
+  scores.forEach((s,i)=>{
+    if(s&&s.type==='written'){
+      writtenParts.push(`س${i+1}: ${s.userAns&&s.userAns!=='—'?s.userAns:'(بدون إجابة)'}`);
+    }
+  });
   const sub={
     id:Date.now(),name:participant.name,address:participant.addr,phone:participant.phone,
     date:new Date().toLocaleString('ar-SA'),score:pct,correct:ok,wrong:no,skipped:sk,total:quizCards.length,
@@ -956,7 +1027,10 @@ function finishQuiz(){
   setTimeout(()=>{const rc=document.getElementById('ring-c');rc.style.transition='stroke-dashoffset 1.2s ease';rc.style.strokeDashoffset=390-(pct/100)*390;},300);
   const icon=pct>=90?'🏆':pct>=70?'🎯':pct>=50?'💪':'📚';
   const title=pct>=90?'ممتاز! أنت بطل!':pct>=70?'جيد جداً! استمر!':pct>=50?'جيد! يمكنك أفضل!':'راجع المادة وحاول مجدداً!';
-  document.getElementById('res-icon').textContent=icon;document.getElementById('res-title').textContent=title;document.getElementById('res-stars').textContent=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':pct>=50?'⭐':'';
+  document.getElementById('res-icon').textContent=icon;
+  const rTitle=document.getElementById('res-title');
+  rTitle.textContent=title;rTitle.style.color='';
+  document.getElementById('res-stars').textContent=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':pct>=50?'⭐':'';
 }
 function restartQuiz(){showScreen('name-screen');}
 
