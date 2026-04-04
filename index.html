@@ -232,7 +232,7 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
   <div id="res-icon" style="font-size:72px;animation:popIn .6s ease-out">🏆</div>
   <div id="res-stars" style="font-size:2rem;display:flex;gap:4px;justify-content:center"></div>
   <h2 id="res-title" style="font-size:1.9rem;font-weight:900">أحسنت!</h2>
-  <div id="res-msg" style="font-size:1rem;color:var(--muted);max-width:300px;text-align:center;line-height:1.7;padding:8px 0"></div>
+  <div id="res-msg" style="font-size:1rem;color:var(--muted);max-width:320px;text-align:center;line-height:1.8;padding:12px 16px;border-radius:12px;transition:all .3s"></div>
   <div class="ring-wrap">
     <svg width="150" height="150" viewBox="0 0 150 150">
       <circle cx="75" cy="75" r="62" fill="none" stroke="var(--s1)" stroke-width="13"/>
@@ -303,6 +303,49 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
     <div class="field">
       <label>💬 رسالة الانتهاء للمشتركين</label>
       <textarea id="finish-msg" placeholder="مثال: جزاكم الله خيراً على مشاركتكم..." style="min-height:70px"></textarea>
+    </div>
+
+    <!-- Message Styling -->
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="font-size:.82rem;color:var(--gold);font-weight:700;margin-bottom:12px">🎨 تخصيص رسالة الانتهاء</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px">لون النص</label>
+          <input type="color" id="msg-color" value="#d4af37" oninput="previewMsg()" style="width:100%;height:36px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--s2)">
+        </div>
+        <div>
+          <label style="font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px">لون الخلفية</label>
+          <input type="color" id="msg-bg" value="#1a1a2e" oninput="previewMsg()" style="width:100%;height:36px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--s2)">
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px">نوع الخط</label>
+        <select id="msg-font" onchange="previewMsg()" style="font-size:.88rem">
+          <option value="Tajawal">Tajawal — عادي</option>
+          <option value="Amiri">Amiri — مصحفي</option>
+          <option value="Cairo">Cairo — كايرو</option>
+        </select>
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px">حجم الخط</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="changeMsgSize(-1)" style="background:var(--s2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-family:inherit">−</button>
+          <span id="msg-size-val" style="font-size:.9rem;font-weight:700;min-width:34px;text-align:center">16px</span>
+          <button onclick="changeMsgSize(1)" style="background:var(--s2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-family:inherit">+</button>
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px">🖼️ صورة مع الرسالة (اختياري)</label>
+        <div class="img-zone" style="padding:12px">
+          <input type="file" accept="image/*" onchange="loadMsgImg(this)">
+          <div style="font-size:.85rem">📁 رفع صورة</div>
+        </div>
+        <div id="msg-img-preview" style="margin-top:8px;display:none">
+          <img id="msg-img-el" style="max-width:100%;max-height:100px;border-radius:8px;object-fit:cover" src="" alt="">
+          <button onclick="removeMsgImg()" style="background:rgba(247,85,106,.1);border:1px solid rgba(247,85,106,.3);color:var(--red);border-radius:8px;padding:4px 12px;font-family:inherit;font-size:.8rem;cursor:pointer;margin-top:4px;display:block">✕ حذف الصورة</button>
+        </div>
+      </div>
+      <button onclick="previewMsg()" style="background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 16px;font-family:inherit;font-size:.85rem;cursor:pointer;width:100%">👁️ معاينة الرسالة</button>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button onclick="showScreen('editor-screen');renderEditor()" style="flex:1;background:linear-gradient(135deg,#4f8ef7,#7b6ff7);color:#fff;border:none;border-radius:12px;padding:12px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;min-width:140px">✏️ إنشاء الأسئلة</button>
@@ -524,12 +567,100 @@ function setVol(v){if(musicAudio)musicAudio.volume=parseFloat(v);}
 
 // ===== SETTINGS =====
 function getSettings(){try{return JSON.parse(localStorage.getItem(STK))||{addr:true,phone:true,result:true,answer:true,finishMsg:''};}catch{return{addr:true,phone:true,result:true,answer:true,finishMsg:''}; }}
+let msgFontSize=16, msgImgSrc=null;
+
+function changeMsgSize(d){
+  msgFontSize=Math.max(10,Math.min(28,msgFontSize+d));
+  document.getElementById('msg-size-val').textContent=msgFontSize+'px';
+  previewMsg();
+}
+function loadMsgImg(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    msgImgSrc=e.target.result;
+    const prev=document.getElementById('msg-img-preview');
+    const el=document.getElementById('msg-img-el');
+    if(prev&&el){prev.style.display='block';el.src=e.target.result;}
+    previewMsg();
+    showToast('تم رفع الصورة ✅','ok');
+  };
+  r.readAsDataURL(f);
+}
+function removeMsgImg(){
+  msgImgSrc=null;
+  const prev=document.getElementById('msg-img-preview');
+  if(prev)prev.style.display='none';
+  previewMsg();
+}
+function previewMsg(){
+  const msg=document.getElementById('finish-msg').value;
+  const color=document.getElementById('msg-color').value;
+  const bg=document.getElementById('msg-bg').value;
+  const font=document.getElementById('msg-font').value;
+  const el=document.getElementById('res-msg');
+  if(!el)return;
+  let content='';
+  if(msgImgSrc)content+=`<img src="${msgImgSrc}" style="max-width:100%;max-height:120px;border-radius:10px;margin-bottom:8px;object-fit:cover;display:block;margin-left:auto;margin-right:auto">`;
+  if(msg)content+=`<span>${msg}</span>`;
+  el.innerHTML=content||'';
+  el.style.color=color;
+  el.style.background=bg==='#1a1a2e'?'transparent':bg;
+  el.style.fontFamily=`'${font}',sans-serif`;
+  el.style.fontSize=msgFontSize+'px';
+  if(msg||msgImgSrc)showToast('تم التطبيق ✅','ok');
+}
+function getMsgStyle(){
+  return {
+    color:document.getElementById('msg-color')?document.getElementById('msg-color').value:'#d4af37',
+    bg:document.getElementById('msg-bg')?document.getElementById('msg-bg').value:'#1a1a2e',
+    font:document.getElementById('msg-font')?document.getElementById('msg-font').value:'Tajawal',
+    fontSize:msgFontSize,
+    imgSrc:msgImgSrc||null
+  };
+}
+function applyMsgStyle(s,msg){
+  const el=document.getElementById('res-msg');
+  if(!el)return;
+  let content='';
+  if(s.imgSrc)content+=`<img src="${s.imgSrc}" style="max-width:100%;max-height:120px;border-radius:10px;margin-bottom:8px;object-fit:cover;display:block;margin-left:auto;margin-right:auto">`;
+  if(msg)content+=`<span>${msg}</span>`;
+  el.innerHTML=content||'';
+  el.style.color=s.color||'var(--muted)';
+  el.style.background=s.bg&&s.bg!=='#1a1a2e'?s.bg:'transparent';
+  el.style.fontFamily=s.font?`'${s.font}',sans-serif`:'inherit';
+  el.style.fontSize=(s.fontSize||16)+'px';
+}
+
 function saveSettings(){
-  const s={addr:document.getElementById('s-addr').checked,phone:document.getElementById('s-phone').checked,result:document.getElementById('s-result').checked,answer:document.getElementById('s-answer').checked,finishMsg:document.getElementById('finish-msg').value};
+  const s={
+    addr:document.getElementById('s-addr').checked,
+    phone:document.getElementById('s-phone').checked,
+    result:document.getElementById('s-result').checked,
+    answer:document.getElementById('s-answer').checked,
+    finishMsg:document.getElementById('finish-msg').value,
+    msgStyle:getMsgStyle()
+  };
   localStorage.setItem(STK,JSON.stringify(s));applyForm();showToast('تم حفظ الإعدادات ✅','ok');
 }
 function applyForm(){const s=getSettings();document.getElementById('f-address').style.display=s.addr?'block':'none';document.getElementById('f-phone').style.display=s.phone?'block':'none';}
-function applyToggles(){const s=getSettings();document.getElementById('s-addr').checked=s.addr;document.getElementById('s-phone').checked=s.phone;document.getElementById('s-result').checked=s.result;document.getElementById('s-answer').checked=s.answer;document.getElementById('finish-msg').value=s.finishMsg||'';}
+function applyToggles(){
+  const s=getSettings();
+  document.getElementById('s-addr').checked=s.addr;
+  document.getElementById('s-phone').checked=s.phone;
+  document.getElementById('s-result').checked=s.result;
+  document.getElementById('s-answer').checked=s.answer;
+  document.getElementById('finish-msg').value=s.finishMsg||'';
+  if(s.msgStyle){
+    try{
+      if(s.msgStyle.color)document.getElementById('msg-color').value=s.msgStyle.color;
+      if(s.msgStyle.bg)document.getElementById('msg-bg').value=s.msgStyle.bg;
+      if(s.msgStyle.font)document.getElementById('msg-font').value=s.msgStyle.font;
+      if(s.msgStyle.fontSize){msgFontSize=s.msgStyle.fontSize;document.getElementById('msg-size-val').textContent=s.msgStyle.fontSize+'px';}
+      if(s.msgStyle.imgSrc){msgImgSrc=s.msgStyle.imgSrc;const prev=document.getElementById('msg-img-preview');const el=document.getElementById('msg-img-el');if(prev&&el){prev.style.display='block';el.src=s.msgStyle.imgSrc;}}
+    }catch(e){}
+  }
+}
 
 // ===== THEMES =====
 function applyTheme(name){
@@ -609,7 +740,7 @@ async function loadConfig(){
     const full=await res.json();
     const cfg=full.customization||{};
     const sett=full.settings;
-    if(sett)localStorage.setItem(STK,JSON.stringify(sett));
+    if(sett){localStorage.setItem(STK,JSON.stringify(sett));}
     if(cfg.theme)applyTheme(cfg.theme);
     if(cfg.appBg){document.documentElement.style.setProperty('--bg',cfg.appBg);document.body.style.background=cfg.appBg;}
     if(cfg.homeBg)document.getElementById('home-bg').style.background=`linear-gradient(160deg,${cfg.homeBg} 0%,${cfg.homeBg}cc 40%,${cfg.homeBg}99 100%)`;
@@ -819,7 +950,7 @@ function finishQuiz(){
   }).catch(()=>{});
   const s=getSettings();
   showScreen('result-screen');
-  document.getElementById('res-msg').textContent=s.finishMsg||'';
+  applyMsgStyle(s.msgStyle||{color:'var(--muted)',bg:'transparent',font:'Tajawal',fontSize:16,imgSrc:null}, s.finishMsg||'');
   if(!s.result){document.getElementById('res-icon').textContent='🙏';document.getElementById('res-title').textContent='شكراً على مشاركتك!';document.getElementById('res-stars').textContent='';document.getElementById('ring-pct').textContent='✓';document.getElementById('sc-ok').textContent='—';document.getElementById('sc-no').textContent='—';document.getElementById('sc-sk').textContent='—';return;}
   document.getElementById('sc-ok').textContent=ok;document.getElementById('sc-no').textContent=no;document.getElementById('sc-sk').textContent=sk;document.getElementById('ring-pct').textContent=pct+'%';document.getElementById('prog').style.width='100%';
   setTimeout(()=>{const rc=document.getElementById('ring-c');rc.style.transition='stroke-dashoffset 1.2s ease';rc.style.strokeDashoffset=390-(pct/100)*390;},300);
