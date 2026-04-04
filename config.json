@@ -3,7 +3,7 @@
     "theme": "paper",
     "homeBg": "#0a2a1a",
     "btnColor": "#d4af37",
-    "appBg": "#07080f",
+    "appBg": "#ffffff",
     "logoBgColor": "#1a4a8a",
     "line1": "مسابقة",
     "line2": "دار سفوان القرآنية",
@@ -24,8 +24,8 @@
     "answer": false,
     "finishMsg": "اللهم عجل لوليك الفرج",
     "msgStyle": {
-      "color": "#f3f3f2",
-      "bg": "#1a1a2e",
+      "color": "#171702",
+      "bg": "#ffffff",
       "font": "Amiri",
       "fontSize": 16,
       "imgSrc": null
