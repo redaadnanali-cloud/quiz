@@ -841,6 +841,10 @@ async function loadConfig(){
       if(cfg.imgSize){document.getElementById('img-size').value=cfg.imgSize;document.getElementById('is-val').textContent=cfg.imgSize+'px';}
       if(cfg.musicVol)document.getElementById('vol').value=cfg.musicVol;
       if(cfg.clickType!=null)selectClick(cfg.clickType);
+    // Apply thankyou settings from config
+    if(sett&&sett.thankyouIcon){try{document.getElementById('thankyou-icon').value=sett.thankyouIcon;}catch(e){}}
+    if(sett&&sett.thankyouColor){try{document.getElementById('thankyou-color').value=sett.thankyouColor;}catch(e){}}
+    if(sett&&sett.thankyouText){try{document.getElementById('thankyou-text').value=sett.thankyouText;}catch(e){}}
     }catch(e){}
   }catch(e){}
 }
@@ -1034,9 +1038,10 @@ function finishQuiz(){
   const icon=pct>=90?'🏆':pct>=70?'🎯':pct>=50?'💪':'📚';
   const title=pct>=90?'ممتاز! أنت بطل!':pct>=70?'جيد جداً! استمر!':pct>=50?'جيد! يمكنك أفضل!':'راجع المادة وحاول مجدداً!';
   document.getElementById('res-icon').textContent=icon;
-  const rTitle=document.getElementById('res-title');
-  rTitle.textContent=title;rTitle.style.color='';
+  const rTitleEl=document.getElementById('res-title');
+  rTitleEl.textContent=title;rTitleEl.style.color='';
   document.getElementById('res-stars').textContent=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':pct>=50?'⭐':'';
+  setTimeout(()=>launchConfetti(s.thankyouIcon||'🎉'),300);
 }
 function restartQuiz(){showScreen('name-screen');}
 

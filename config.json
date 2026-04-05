@@ -3,8 +3,8 @@
     "theme": "offwhite",
     "homeBg": "#0a2a1a",
     "btnColor": "#d4af37",
-    "appBg": "#010b56",
-    "logoBgColor": "#150061",
+    "appBg": "#010f74",
+    "logoBgColor": "#1a4a8a",
     "line1": "مسابقة",
     "line2": "دار سفوان القرآنية",
     "line3": "الشهرية",
@@ -24,14 +24,14 @@
     "answer": false,
     "finishMsg": "اللهم عجل لوليك الفرج",
     "msgStyle": {
-      "color": "#faf9f4",
+      "color": "#cbb64d",
       "bg": "#1a1a2e",
-      "font": "Tajawal",
-      "fontSize": 16,
+      "font": "Amiri",
+      "fontSize": 18,
       "imgSrc": null
     },
     "thankyouText": "شكراً على مشاركتك!",
-    "thankyouColor": "#ffffff",
+    "thankyouColor": "#ac3939",
     "thankyouIcon": "🎉"
   }
 }
