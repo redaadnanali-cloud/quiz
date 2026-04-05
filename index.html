@@ -125,6 +125,10 @@ select option{background:var(--card)}
 input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:pointer;background:none;padding:0}
 .music-opt{background:var(--s1);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600;color:var(--text);transition:all .2s;text-align:right;width:100%;margin-bottom:6px}
 .music-opt.active{border-color:var(--accent);background:rgba(79,142,247,.1);color:var(--accent)}
+@keyframes confettiFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
 @media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr}.submissions-table td,.submissions-table th{padding:8px 10px}.pct-bar-wrap{width:50px}}
 </style>
 </head>
@@ -250,7 +254,7 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
     <div class="score-item"><div class="score-num" id="sc-sk" style="color:var(--muted)">0</div><div class="score-txt">⏭️ متخطى</div></div>
   </div>
   <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px">
-    <button onclick="playClick();restartQuiz()" style="background:linear-gradient(135deg,#3dd68c,#2ec77a);color:#061a10;font-weight:900;border:none;border-radius:12px;padding:14px;cursor:pointer;font-family:inherit;font-size:1rem;width:100%">🔄 إعادة المحاولة</button>
+
     <button class="btn btn-ghost btn-full" onclick="stopMusic();showScreen('home-screen')">🏠 الرئيسية</button>
   </div>
 </div>
@@ -320,14 +324,16 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
         <div>
           <label style="font-size:.78rem;color:var(--muted);display:block;margin-bottom:4px">الإيموجي</label>
           <select id="thankyou-icon" style="font-size:1.2rem;text-align:center">
+            <option value="🎉" selected>🎉</option>
             <option value="🙏">🙏</option>
             <option value="🌟">🌟</option>
             <option value="💚">💚</option>
-            <option value="🎉">🎉</option>
             <option value="📖">📖</option>
             <option value="🕌">🕌</option>
             <option value="✨">✨</option>
             <option value="🏆">🏆</option>
+            <option value="🌸">🌸</option>
+            <option value="🦋">🦋</option>
           </select>
         </div>
       </div>
@@ -1102,6 +1108,29 @@ function exportCSV(){
 function openSheets(){
   // Open Google Drive to find the sheet
   window.open('https://drive.google.com/drive/search?q=نتائج+المسابقة', '_blank');
+}
+function launchConfetti(emoji){
+  const emojis = emoji ? [emoji] : ['🎉','✨','⭐','🌟','💫'];
+  const container = document.body;
+  for(let i=0;i<60;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      const e=emojis[Math.floor(Math.random()*emojis.length)];
+      el.textContent=e;
+      el.style.cssText=`
+        position:fixed;
+        top:-40px;
+        left:${Math.random()*100}vw;
+        font-size:${16+Math.random()*24}px;
+        z-index:9999;
+        pointer-events:none;
+        animation:confettiFall ${1.5+Math.random()*2}s ease-in forwards;
+        transform:rotate(${Math.random()*360}deg);
+      `;
+      container.appendChild(el);
+      setTimeout(()=>el.remove(), 3500);
+    }, i*60);
+  }
 }
 function showToast(msg,type){const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 
