@@ -23,8 +23,8 @@
     "result": false,
     "answer": false,
     "timer": false,
-    "locked": false,
-    "lockMsg": "",
+    "locked": true,
+    "lockMsg": "انتظرونا قريبا ",
     "timerSecs": 30,
     "finishMsg": "اللهم عجل لوليك الفرج",
     "msgStyle": {
