@@ -14,7 +14,7 @@
   --text:#e8eaf6;--muted:#6b7099;--r:16px;
 }
 body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:16px;transition:background .3s,color .3s}
-.screen{display:none;min-height:100vh;padding:20px 16px;flex-direction:column}
+.screen{display:none;min-height:100vh;padding:20px 16px;flex-direction:column;opacity:1;transform:translateY(0);transition:opacity .3s,transform .3s}
 .screen.active{display:flex}
 .centered{align-items:center;justify-content:center;text-align:center}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:12px;border:none;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
@@ -29,6 +29,7 @@ select option{background:var(--card)}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;font-weight:600}
 .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;transition:background .3s}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
@@ -133,7 +134,11 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
 </style>
 </head>
 <body>
-<div id="app">
+<div id="loading-screen" style="position:fixed;inset:0;background:linear-gradient(160deg,#0a2a1a,#0d3322,#071a10);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
+  <div style="width:80px;height:80px;border:3px solid rgba(212,175,55,.2);border-top-color:#d4af37;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px"></div>
+  <div style="font-family:'Tajawal',sans-serif;color:#d4af37;font-size:1.1rem;font-weight:700">جاري التحميل...</div>
+</div>
+<div id="app" style="opacity:0;transition:opacity .5s">
 
 <!-- HOME -->
 <div id="home-screen" class="screen centered active" style="padding:0;position:relative;overflow:hidden">
@@ -168,7 +173,22 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
       <button id="main-btn" onclick="playClick();showScreen('name-screen')" style="background:linear-gradient(135deg,#d4af37,#a8852a);color:#1a0f00;font-size:1.05rem;font-weight:900;border-radius:14px;padding:15px;border:none;cursor:pointer;font-family:inherit;width:100%">🚀 ابدأ المسابقة</button>
     </div>
     <div style="margin-top:20px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);border-radius:99px;padding:6px 18px;font-size:.8rem;color:rgba(212,175,55,.8)">💾 النتائج محفوظة تلقائياً</div>
+
   </div>
+</div>
+
+<!-- LOCKED -->
+<div id="locked-screen" class="screen centered" style="gap:24px;padding:40px 24px">
+  <div style="font-size:5rem;animation:float 3s ease-in-out infinite">🔒</div>
+  <div style="text-align:center">
+    <h2 id="lock-title" style="font-size:1.6rem;font-weight:900;margin-bottom:10px">المسابقة قريباً</h2>
+    <p id="lock-subtitle" style="color:var(--muted);font-size:1rem;line-height:1.7">يجري الإعداد للمسابقة، تابعونا!</p>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;max-width:300px;width:100%">
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:8px">ترقبوا الإعلان</div>
+    <div style="font-size:2rem">⏳</div>
+  </div>
+  <button onclick="showScreen('home-screen')" class="btn btn-ghost">← رجوع</button>
 </div>
 
 <!-- NAME -->
@@ -208,6 +228,7 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
   <div style="display:flex;align-items:center;justify-content:space-between">
     <button class="back-btn" onclick="if(confirm('خروج؟')){stopMusic();showScreen('home-screen');}">→</button>
     <span id="q-counter" style="font-size:.88rem;color:var(--muted);font-weight:600">1/1</span>
+    <div id="timer-display" style="display:none;background:var(--s1);border:1.5px solid var(--border);border-radius:20px;padding:4px 14px;font-size:.88rem;font-weight:700;min-width:54px;text-align:center">⏱️ <span id="timer-val">30</span>ث</div>
   </div>
   <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
   <div class="fc-scene" onclick="flipCard(event)">
@@ -274,12 +295,16 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
 <!-- ADMIN -->
 <div id="admin-screen" class="screen" style="max-width:900px;margin:0 auto;width:100%;gap:22px">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-    <div style="font-size:1.5rem;font-weight:800">🛡️ لوحة التحكم</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-size:1.5rem;font-weight:800">🛡️ لوحة التحكم</div>
+      <div id="lock-badge" style="display:none;background:rgba(247,85,106,.15);border:1px solid rgba(247,85,106,.3);color:var(--red);border-radius:99px;padding:3px 12px;font-size:.75rem;font-weight:700">🔒 مقفلة</div>
+    </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button onclick="openSheets()" style="background:linear-gradient(135deg,#34a853,#0f9d58);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">📊 Google Sheets</button>
       <button onclick="exportCSV()" style="background:linear-gradient(135deg,#4f8ef7,#7b6ff7);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">📥 CSV</button>
       <button onclick="clearAll()" style="background:rgba(247,85,106,.15);border:1px solid rgba(247,85,106,.4);color:var(--red);border-radius:10px;padding:9px 16px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">🗑️ مسح</button>
       <button onclick="showScreen('home-screen')" style="background:var(--s1);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:9px 16px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">← خروج</button>
+      <button onclick="changePassDialog()" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:var(--purple);border-radius:10px;padding:9px 16px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">🔑 كلمة المرور</button>
     </div>
   </div>
 
@@ -302,6 +327,39 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
       <div style="display:flex;align-items:center;justify-content:space-between;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:12px 16px">
         <span style="font-size:.88rem;font-weight:600">💡 إظهار الإجابة</span>
         <label class="toggle-switch"><input type="checkbox" id="s-answer" onchange="saveSettings()"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+
+    <!-- Quiz Lock -->
+    <div style="background:rgba(247,85,106,.06);border:1.5px solid rgba(247,85,106,.25);border-radius:14px;padding:14px 16px;margin-top:4px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:.92rem;font-weight:800;color:var(--red)">🔒 قفل المسابقة</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:2px">عند التفعيل تظهر للمشتركين رسالة "قريباً" بدل الأسئلة</div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="s-locked" onchange="toggleLockMsg();saveSettings()"><span class="toggle-slider" style="background:#3d1010"></span></label>
+      </div>
+      <div id="lock-msg-wrap" style="margin-top:10px;display:none">
+        <input type="text" id="lock-msg" placeholder="رسالة للمشتركين... مثال: المسابقة تبدأ قريباً" style="font-size:.88rem">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:12px 16px">
+        <span style="font-size:.88rem;font-weight:600">⏱️ وقت لكل سؤال</span>
+        <label class="toggle-switch"><input type="checkbox" id="s-timer" onchange="saveSettings()"><span class="toggle-slider"></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:12px 16px">
+        <span style="font-size:.88rem;font-weight:600">⏱️ وقت لكل سؤال</span>
+        <label class="toggle-switch"><input type="checkbox" id="s-timer" onchange="saveSettings()"><span class="toggle-slider"></span></label>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:12px 16px">
+        <span style="font-size:.88rem;font-weight:600;display:block;margin-bottom:8px">⏱️ مدة كل سؤال (ثانية)</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="changeTimer(-5)" style="background:var(--s2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:1rem">−</button>
+          <span id="timer-sett-val" style="font-weight:700;font-size:1rem;min-width:40px;text-align:center">30ث</span>
+          <button onclick="changeTimer(5)" style="background:var(--s2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:1rem">+</button>
+        </div>
       </div>
     </div>
     <div class="field">
@@ -394,7 +452,9 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
 
     <!-- Themes -->
     <div style="margin-bottom:16px">
-      <div style="font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:8px">🌙 النمط</div>
+      <div style="font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:8px">🎨 الواجهة</div>
+      <button onclick="showThemePicker()" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;border-radius:12px;padding:12px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:8px">🎨 اختر تصميم الواجهة (8 تصاميم)</button>
+      <div style="font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:8px;margin-top:8px">🌙 نمط إضافي</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
         <button class="theme-btn active" id="th-dark" onclick="applyTheme('dark')">🌑 داكن</button>
         <button class="theme-btn" id="th-offwhite" onclick="applyTheme('offwhite')">🤍 فاتح</button>
@@ -516,9 +576,38 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
   </div>
 
   <div class="stats-grid" id="admin-stats"></div>
+  <div id="chart-area" style="display:none" class="panel">
+    <div style="font-size:.9rem;font-weight:800;color:var(--gold);margin-bottom:12px">📊 توزيع الدرجات</div>
+    <canvas id="score-chart" height="120"></canvas>
+  </div>
   <div>
-    <div style="font-size:1rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">📊 نتائج المشتركين</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <div style="font-size:1rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px">📊 نتائج المشتركين</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="sort-select" onchange="renderAdmin()" style="background:var(--s1);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;font-family:inherit;font-size:.82rem;cursor:pointer">
+          <option value="score">🏆 حسب الدرجة</option>
+          <option value="name">🔤 حسب الاسم</option>
+          <option value="date">📅 حسب التاريخ</option>
+        </select>
+        <input type="text" id="search-subs" oninput="renderAdmin()" placeholder="🔍 بحث..." style="background:var(--s1);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:.82rem;width:120px;outline:none">
+      </div>
+    </div>
     <div class="panel" style="padding:0;overflow:hidden"><div id="subs-area"></div></div>
+  </div>
+</div>
+
+<!-- THEME PICKER MODAL -->
+<div id="theme-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center;padding:0" onclick="if(event.target===this)hideThemePicker()">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:20px 16px 30px;width:100%;max-width:600px;max-height:88vh;overflow-y:auto">
+    <div style="width:40px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 16px"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <h3 style="font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:2px">🎨 تصاميم الواجهة</h3>
+        <div style="font-size:.75rem;color:var(--muted)">اضغط على أي تصميم لتطبيقه فوراً</div>
+      </div>
+      <button onclick="hideThemePicker()" style="background:var(--s1);border:1px solid var(--border);color:var(--muted);border-radius:50%;width:32px;height:32px;font-family:inherit;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" id="themes-grid"></div>
   </div>
 </div>
 
@@ -533,6 +622,7 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
   </div>
 </div>
 
+</div>
 <script>
 const PASS='@Alhkaiah.20@';
 // Embedded sounds
@@ -697,14 +787,25 @@ function applyMsgStyle(s,msg){
   el.style.borderRadius=content?'12px':'0';
 }
 
+function toggleLockMsg(){
+  const cb=document.getElementById('s-locked');
+  const wrap=document.getElementById('lock-msg-wrap');
+  if(wrap)wrap.style.display=cb&&cb.checked?'block':'none';
+}
 function saveSettings(){
+  const cs=getSettings();
   const s={
     addr:document.getElementById('s-addr').checked,
     phone:document.getElementById('s-phone').checked,
     result:document.getElementById('s-result').checked,
     answer:document.getElementById('s-answer').checked,
+    timer:document.getElementById('s-timer')?document.getElementById('s-timer').checked:false,
+    locked:document.getElementById('s-locked')?document.getElementById('s-locked').checked:false,
+    lockMsg:document.getElementById('lock-msg')?document.getElementById('lock-msg').value:'',
+    timerSecs:timerSettVal,
     finishMsg:document.getElementById('finish-msg').value,
     msgStyle:getMsgStyle(),
+    adminPass:cs.adminPass||'@Alhkaiah.20@',
     thankyouText:document.getElementById('thankyou-text')?document.getElementById('thankyou-text').value:'شكراً على مشاركتك!',
     thankyouColor:document.getElementById('thankyou-color')?document.getElementById('thankyou-color').value:'#ffffff',
     thankyouIcon:document.getElementById('thankyou-icon')?document.getElementById('thankyou-icon').value:'🙏'
@@ -714,11 +815,24 @@ function saveSettings(){
 function applyForm(){const s=getSettings();document.getElementById('f-address').style.display=s.addr?'block':'none';document.getElementById('f-phone').style.display=s.phone?'block':'none';}
 function applyToggles(){
   const s=getSettings();
+  // Show lock badge in header
+  const lb=document.getElementById('lock-badge');
+  if(lb)lb.style.display=s.locked?'flex':'none';
   document.getElementById('s-addr').checked=s.addr;
   document.getElementById('s-phone').checked=s.phone;
   document.getElementById('s-result').checked=s.result;
   document.getElementById('s-answer').checked=s.answer;
   document.getElementById('finish-msg').value=s.finishMsg||'';
+  try{
+    if(document.getElementById('s-timer'))document.getElementById('s-timer').checked=s.timer||false;
+    if(s.timerSecs){timerSettVal=s.timerSecs;const tv=document.getElementById('timer-sett-val');if(tv)tv.textContent=s.timerSecs+'ث';}
+    if(document.getElementById('s-locked')){
+      document.getElementById('s-locked').checked=s.locked||false;
+      const lw=document.getElementById('lock-msg-wrap');
+      if(lw)lw.style.display=s.locked?'block':'none';
+    }
+    if(document.getElementById('lock-msg'))document.getElementById('lock-msg').value=s.lockMsg||'';
+  }catch(e){}
   if(s.msgStyle){
     try{
       if(s.msgStyle.color)document.getElementById('msg-color').value=s.msgStyle.color;
@@ -880,7 +994,28 @@ function loadSubs(){try{return JSON.parse(localStorage.getItem(SK))||[];}catch{r
 function saveSubs(){localStorage.setItem(SK,JSON.stringify(subs));}
 
 // ===== SCREENS =====
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='name-screen')applyForm();}
+function showScreen(id){
+  // If trying to go to name-screen, check if locked
+  if(id==='name-screen'){
+    const s=getSettings();
+    if(s.locked){
+      // Show locked screen instead
+      const lt=document.getElementById('lock-title');
+      const ls=document.getElementById('lock-subtitle');
+      if(lt)lt.textContent='المسابقة قريباً 🔒';
+      if(ls)ls.textContent=s.lockMsg||'يجري الإعداد للمسابقة، تابعونا!';
+      id='locked-screen';
+    }
+  }
+  const screens=document.querySelectorAll('.screen');
+  screens.forEach(s=>{s.style.opacity='0';s.style.transform='translateY(8px)';});
+  setTimeout(()=>{
+    screens.forEach(s=>s.classList.remove('active'));
+    const el=document.getElementById(id);
+    if(el){el.classList.add('active');setTimeout(()=>{el.style.opacity='1';el.style.transform='translateY(0)';},20);}
+    if(id==='name-screen')applyForm();
+  },150);
+}
 
 // ===== ADMIN =====
 function goAdmin(){showScreen('login-screen');setTimeout(()=>document.getElementById('admin-pass').focus(),200);}
@@ -941,6 +1076,25 @@ function renderQ(){
   renderAns(c);
   document.getElementById('prev-btn').style.opacity=idx===0?'0.3':'1';
   document.getElementById('next-btn').textContent=idx===quizCards.length-1?'إنهاء 🏁':'التالي →';
+  stopTimer();
+  const s2=getSettings();
+  if(s2.timer&&s2.timerSecs>0){
+    startTimer(s2.timerSecs,()=>{
+      if(!answered){
+        const c2=quizCards[idx];
+        if(c2.type==='written'){
+          const wi=document.getElementById('wi');
+          const inp=wi?wi.value.trim():'';
+          scores[idx]={result:'skipped',userAns:inp||'انتهى الوقت',correctAns:c2.answer||'',type:'written',question:c2.question};
+        } else {
+          scores[idx]={result:'skipped',userAns:'انتهى الوقت ⏱️',correctAns:'',type:c2.type,question:c2.question};
+        }
+        answered=true;
+        showToast('انتهى الوقت! ⏱️','err');
+        setTimeout(()=>nextQ(),800);
+      }
+    });
+  }
 }
 
 function renderAns(c){
@@ -960,7 +1114,7 @@ function renderAns(c){
   }
 }
 
-function autoFlip(){if(getSettings().answer)document.getElementById('fc').classList.add('flipped');}
+function autoFlip(){stopTimer();if(getSettings().answer)document.getElementById('fc').classList.add('flipped');}
 function ansMCQ(i){
   if(answered)return;answered=true;
   const c=quizCards[idx];const ok=i===c.correct;
@@ -1070,9 +1224,44 @@ function renderAdmin(){
   applyToggles();
   const total=subs.length;const avg=total?Math.round(subs.reduce((a,s)=>a+s.score,0)/total):0;const best=total?Math.max(...subs.map(s=>s.score)):0;const p100=subs.filter(s=>s.score===100).length;
   document.getElementById('admin-stats').innerHTML=`<div class="stat-card"><div class="stat-num" style="color:var(--accent)">${total}</div><div class="stat-lbl">المشاركون</div></div><div class="stat-card"><div class="stat-num" style="color:var(--green)">${avg}%</div><div class="stat-lbl">متوسط</div></div><div class="stat-card"><div class="stat-num" style="color:var(--gold)">${best}%</div><div class="stat-lbl">أعلى درجة</div></div><div class="stat-card"><div class="stat-num" style="color:var(--purple)">${p100}</div><div class="stat-lbl">💯 علامة كاملة</div></div>`;
+  // Draw chart
+  try{
+    const chartArea=document.getElementById('chart-area');
+    const canvas=document.getElementById('score-chart');
+    if(total>0&&chartArea&&canvas){
+      chartArea.style.display='block';
+      const ranges=[{l:'0-20',min:0,max:20},{l:'21-40',min:21,max:40},{l:'41-60',min:41,max:60},{l:'61-80',min:61,max:80},{l:'81-100',min:81,max:100}];
+      const counts=ranges.map(r=>subs.filter(s=>s.score>=r.min&&s.score<=r.max).length);
+      const maxCount=Math.max(...counts,1);
+      const ctx=canvas.getContext('2d');
+      const W=canvas.offsetWidth||300;canvas.width=W;canvas.height=120;
+      ctx.clearRect(0,0,W,120);
+      const bw=(W-40)/5-8;
+      counts.forEach((c,i)=>{
+        const x=40+i*(bw+8);
+        const h=Math.max(4,(c/maxCount)*80);
+        const y=90-h;
+        ctx.fillStyle='rgba(79,142,247,0.7)';
+        ctx.beginPath();ctx.roundRect(x,y,bw,h,4);ctx.fill();
+        ctx.fillStyle='var(--text,#e8eaf6)';ctx.font='11px Tajawal,sans-serif';ctx.textAlign='center';
+        if(c>0)ctx.fillText(c,x+bw/2,y-4);
+        ctx.fillStyle='rgba(107,112,153,0.8)';ctx.font='10px Tajawal,sans-serif';
+        ctx.fillText(ranges[i].l,x+bw/2,108);
+      });
+      ctx.strokeStyle='rgba(107,112,153,0.2)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(36,10);ctx.lineTo(36,92);ctx.lineTo(W-10,92);ctx.stroke();
+    } else if(chartArea){chartArea.style.display='none';}
+  }catch(e){}
   const area=document.getElementById('subs-area');
   if(!total){area.innerHTML='<div style="text-align:center;padding:48px;color:var(--muted)"><div style="font-size:3rem;margin-bottom:12px">📭</div>لا توجد نتائج بعد</div>';return;}
-  const sorted=[...subs].sort((a,b)=>b.score-a.score);
+  const sortBy=document.getElementById('sort-select')?document.getElementById('sort-select').value:'score';
+  const searchQ=(document.getElementById('search-subs')?document.getElementById('search-subs').value:'').toLowerCase().trim();
+  let filtered=searchQ?subs.filter(s=>(s.name||'').toLowerCase().includes(searchQ)||(s.address||'').toLowerCase().includes(searchQ)):subs;
+  const sorted=[...filtered].sort((a,b)=>{
+    if(sortBy==='name')return (a.name||'').localeCompare(b.name||'','ar');
+    if(sortBy==='date')return new Date(b.id)-new Date(a.id);
+    return b.score-a.score;
+  });
   area.innerHTML=`<div style="overflow-x:auto"><table class="submissions-table"><thead><tr><th>#</th><th>الاسم</th><th>العنوان</th><th>الهاتف</th><th>النتيجة</th><th>✍️ مكتوبة</th><th>التاريخ</th><th></th></tr></thead><tbody>${sorted.map((s,i)=>{
     const rb=i<3?`<span class="rank-badge r${i+1}">${i+1}</span>`:`<span class="rank-badge rn">${i+1}</span>`;
     const tag=s.score>=80?'<span class="tag tag-green">ممتاز</span>':s.score>=50?'<span class="tag tag-muted">جيد</span>':'<span class="tag tag-red">ضعيف</span>';
@@ -1157,9 +1346,249 @@ function launchConfetti(emoji){
     }, i*60);
   }
 }
+// ===== UI THEMES =====
+const UI_THEMES = [
+  {
+    id:'islamic-green',
+    name:'القرآني الذهبي',
+    emoji:'🕌',
+    desc:'داكن وذهبي',
+    preview:['#0a2a1a','#d4af37','#1a5c30'],
+    vars:{bg:'#060d08',s1:'#0c1a10',s2:'#122016',card:'#162b1c',border:'#1e4028',text:'#f0f7f2',muted:'#7aaa88',accent:'#d4af37',green:'#4ade80',red:'#f87171',gold:'#d4af37'},
+    home:{bg1:'#071a10',bg2:'#0d3320',bg3:'#040d08',btn:'linear-gradient(135deg,#c9a227,#8b6914)',btnText:'#0a1a08'}
+  },
+  {
+    id:'midnight-pro',
+    name:'منتصف الليل',
+    emoji:'🌌',
+    desc:'أسود ساحر',
+    preview:['#080810','#6366f1','#0f0f1a'],
+    vars:{bg:'#030308',s1:'#08080f',s2:'#0d0d18',card:'#111120',border:'#1e1e38',text:'#f1f0ff',muted:'#8b8bbb',accent:'#6366f1',green:'#4ade80',red:'#f87171',gold:'#fbbf24'},
+    home:{bg1:'#050510',bg2:'#0d0d2e',bg3:'#030308',btn:'linear-gradient(135deg,#6366f1,#4338ca)',btnText:'#fff'}
+  },
+  {
+    id:'ocean-depth',
+    name:'أعماق البحر',
+    emoji:'🌊',
+    desc:'أزرق عميق',
+    preview:['#020c1b','#38bdf8','#0a2a4a'],
+    vars:{bg:'#010a15',s1:'#061525',s2:'#0a2035',card:'#0e2840',border:'#143358',text:'#e0f4ff',muted:'#6ba8cc',accent:'#38bdf8',green:'#34d399',red:'#fb7185',gold:'#fcd34d'},
+    home:{bg1:'#020c1b',bg2:'#0a2a4a',bg3:'#010810',btn:'linear-gradient(135deg,#0ea5e9,#0369a1)',btnText:'#fff'}
+  },
+  {
+    id:'aurora',
+    name:'الشفق القطبي',
+    emoji:'🌠',
+    desc:'ألوان الشمال',
+    preview:['#050a10','#06ffa5','#0d1a30'],
+    vars:{bg:'#040810',s1:'#080f1e',s2:'#0c162c',card:'#101e3a',border:'#162840',text:'#edfffe',muted:'#5a9a9a',accent:'#06ffa5',green:'#06ffa5',red:'#ff6b9d',gold:'#ffe566'},
+    home:{bg1:'#040c18',bg2:'#061824',bg3:'#02060e',btn:'linear-gradient(135deg,#06ffa5,#00cc85)',btnText:'#021a10'}
+  },
+  {
+    id:'royal-obsidian',
+    name:'الأوبسيدian الملكي',
+    emoji:'💎',
+    desc:'بنفسجي فاخر',
+    preview:['#0a0514','#a855f7','#1a0a2e'],
+    vars:{bg:'#06030e',s1:'#0d0618',s2:'#130820',card:'#1a0b2a',border:'#2d1248',text:'#f5f0ff',muted:'#9070c0',accent:'#a855f7',green:'#4ade80',red:'#f87171',gold:'#fbbf24'},
+    home:{bg1:'#080412',bg2:'#1a0440',bg3:'#04020a',btn:'linear-gradient(135deg,#a855f7,#7c3aed)',btnText:'#fff'}
+  },
+  {
+    id:'carbon',
+    name:'الكربون الداكن',
+    emoji:'⚫',
+    desc:'رمادي احترافي',
+    preview:['#0a0a0a','#e2e8f0','#1a1a1a'],
+    vars:{bg:'#060606',s1:'#0f0f0f',s2:'#161616',card:'#1c1c1c',border:'#2a2a2a',text:'#f1f5f9',muted:'#6b7280',accent:'#e2e8f0',green:'#4ade80',red:'#f87171',gold:'#fbbf24'},
+    home:{bg1:'#0a0a0a',bg2:'#1a1a1a',bg3:'#050505',btn:'linear-gradient(135deg,#374151,#1f2937)',btnText:'#f9fafb'}
+  },
+  {
+    id:'ember',
+    name:'الجمر المتوهج',
+    emoji:'🔥',
+    desc:'نار وجمر',
+    preview:['#0f0500','#f97316','#3d0c00'],
+    vars:{bg:'#080200',s1:'#120500',s2:'#1c0800',card:'#240a00',border:'#3d1000',text:'#fff7ed',muted:'#b06030',accent:'#fb923c',green:'#86efac',red:'#fca5a5',gold:'#fde68a'},
+    home:{bg1:'#120500',bg2:'#5c1a00',bg3:'#080200',btn:'linear-gradient(135deg,#f97316,#dc2626)',btnText:'#fff'}
+  },
+  {
+    id:'sakura',
+    name:'أزهار الكرز',
+    emoji:'🌸',
+    desc:'وردي ناعم',
+    preview:['#1a080e','#f472b6','#3d0818'],
+    vars:{bg:'#0d0408',s1:'#180810',s2:'#220b16',card:'#2c0e1e',border:'#421230',text:'#fff0f8',muted:'#c060a0',accent:'#f472b6',green:'#86efac',red:'#fda4af',gold:'#fde68a'},
+    home:{bg1:'#120508',bg2:'#400a20',bg3:'#080204',btn:'linear-gradient(135deg,#ec4899,#be185d)',btnText:'#fff'}
+  },
+  {
+    id:'emerald-luxury',
+    name:'الزمرد الفاخر',
+    emoji:'💚',
+    desc:'أخضر فاخر',
+    preview:['#022c22','#10b981','#064e3b'],
+    vars:{bg:'#010f0a',s1:'#041a12',s2:'#06241a',card:'#092e22',border:'#0f4030',text:'#ecfdf5',muted:'#6b9a80',accent:'#10b981',green:'#34d399',red:'#fb7185',gold:'#fcd34d'},
+    home:{bg1:'#022c22',bg2:'#064e3b',bg3:'#011810',btn:'linear-gradient(135deg,#059669,#047857)',btnText:'#fff'}
+  },
+  {
+    id:'arctic-clean',
+    name:'النقاء الشمالي',
+    emoji:'🤍',
+    desc:'أبيض نظيف',
+    preview:['#f8fafc','#3b82f6','#eff6ff'],
+    vars:{bg:'#f8fafc',s1:'#f1f5f9',s2:'#e2e8f0',card:'#ffffff',border:'#e2e8f0',text:'#0f172a',muted:'#64748b',accent:'#3b82f6',green:'#16a34a',red:'#dc2626',gold:'#d97706'},
+    home:{bg1:'#1e3a8a',bg2:'#1d4ed8',bg3:'#1e3a8a',btn:'linear-gradient(135deg,#3b82f6,#2563eb)',btnText:'#fff'}
+  },
+  {
+    id:'desert-nomad',
+    name:'الرحّال الصحراوي',
+    emoji:'🏜️',
+    desc:'ذهبي دافئ',
+    preview:['#1c1000','#d4a017','#3d2800'],
+    vars:{bg:'#100900',s1:'#1c1000',s2:'#281800',card:'#342000',border:'#4a3010',text:'#fef9e7',muted:'#a08040',accent:'#d4a017',green:'#86efac',red:'#fca5a5',gold:'#ffd700'},
+    home:{bg1:'#1c1000',bg2:'#3d2800',bg3:'#100900',btn:'linear-gradient(135deg,#d4a017,#9a7010)',btnText:'#100900'}
+  },
+  {
+    id:'neon-cyber',
+    name:'سايبر نيون',
+    emoji:'⚡',
+    desc:'مستقبلي نيون',
+    preview:['#000510','#00ffff','#001a1a'],
+    vars:{bg:'#000408',s1:'#000a10',s2:'#000f18',card:'#001420',border:'#002030',text:'#e0ffff',muted:'#408080',accent:'#00ffff',green:'#39ff14',red:'#ff073a',gold:'#ffff00'},
+    home:{bg1:'#000510',bg2:'#001a20',bg3:'#000205',btn:'linear-gradient(135deg,#00e5ff,#0097a7)',btnText:'#000a10'}
+  }
+];
+
+let currentUITheme='islamic-green';
+
+function applyUITheme(themeId){
+  const t=UI_THEMES.find(x=>x.id===themeId);
+  if(!t)return;
+  currentUITheme=themeId;
+  const r=document.documentElement.style;
+  Object.entries(t.vars).forEach(([k,v])=>r.setProperty('--'+k,v));
+  // Home screen
+  const hbg=document.getElementById('home-bg');
+  if(hbg)hbg.style.background=`linear-gradient(160deg,${t.home.bg1} 0%,${t.home.bg2} 40%,${t.home.bg3} 100%)`;
+  const mbtn=document.getElementById('main-btn');
+  if(mbtn){mbtn.style.background=t.home.btn;mbtn.style.color=t.home.btnText;}
+  document.body.style.background=t.vars.bg;
+  document.body.style.color=t.vars.text;
+  // Save
+  localStorage.setItem('fc_ui_theme',themeId);
+  // Update active in grid
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('theme-active'));
+  const active=document.getElementById('tc-'+themeId);
+  if(active)active.classList.add('theme-active');
+}
+
+function buildThemesGrid(){
+  const grid=document.getElementById('themes-grid');
+  if(!grid)return;
+  grid.innerHTML=UI_THEMES.map(t=>{
+    const isActive=currentUITheme===t.id;
+    return `<div class="theme-card" id="tc-${t.id}" onclick="applyUITheme('${t.id}')" style="border:2px solid ${isActive?'var(--accent)':'var(--border)'};border-radius:16px;overflow:hidden;cursor:pointer;transition:all .2s;${isActive?'box-shadow:0 0 0 3px var(--accent),0 0 20px rgba(99,102,241,.3)':''}">
+      <div style="height:70px;background:linear-gradient(135deg,${t.preview[0]} 0%,${t.preview[2]} 100%);display:flex;align-items:center;justify-content:center;position:relative">
+        <span style="font-size:1.6rem">${t.emoji}</span>
+        <div style="position:absolute;bottom:6px;right:6px;display:flex;gap:3px">
+          ${t.preview.map(c=>`<div style="width:10px;height:10px;border-radius:50%;background:${c};border:1px solid rgba(255,255,255,.4)"></div>`).join('')}
+          <div style="width:12px;height:12px;border-radius:50%;background:${t.preview[1]};border:1px solid rgba(255,255,255,.5)"></div>
+        </div>
+        ${isActive?'<div style="position:absolute;top:6px;left:6px;background:var(--accent);color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:99px">✓ مفعّل</div>':''}
+      </div>
+      <div style="padding:8px 10px;background:var(--card)">
+        <div style="font-size:.82rem;font-weight:800;color:var(--text);margin-bottom:2px">${t.name}</div>
+        <div style="font-size:.7rem;color:var(--muted)">${t.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showThemePicker(){
+  buildThemesGrid();
+  const m=document.getElementById('theme-modal');
+  if(m)m.style.display='flex';
+}
+function hideThemePicker(){
+  const m=document.getElementById('theme-modal');
+  if(m)m.style.display='none';
+}
+
+// Load saved theme
+function loadSavedTheme(){
+  const saved=localStorage.getItem('fc_ui_theme');
+  if(saved)applyUITheme(saved);
+}
+
+// Add theme-active CSS
+const themeStyle=document.createElement('style');
+themeStyle.textContent='.theme-active{border-color:var(--accent)!important;box-shadow:0 0 0 2px var(--accent);}';
+document.head.appendChild(themeStyle);
+
+// Timer
+let timerInterval=null, timerSettVal=30;
+function changeTimer(d){
+  timerSettVal=Math.max(5,Math.min(300,timerSettVal+d));
+  const el=document.getElementById('timer-sett-val');
+  if(el)el.textContent=timerSettVal+'ث';
+}
+function startTimer(secs,onEnd){
+  clearInterval(timerInterval);
+  let remaining=secs;
+  const el=document.getElementById('timer-val');
+  const disp=document.getElementById('timer-display');
+  if(disp)disp.style.display='flex';
+  if(el)el.textContent=remaining;
+  timerInterval=setInterval(()=>{
+    remaining--;
+    if(el)el.textContent=remaining;
+    const td=document.getElementById('timer-display');
+    if(td){
+      td.style.borderColor=remaining<=10?'var(--red)':'var(--border)';
+      td.style.color=remaining<=10?'var(--red)':'var(--text)';
+    }
+    if(remaining<=0){clearInterval(timerInterval);if(onEnd)onEnd();}
+  },1000);
+}
+function stopTimer(){
+  clearInterval(timerInterval);
+  const disp=document.getElementById('timer-display');
+  if(disp)disp.style.display='none';
+}
+
+// Change password
+function changePassDialog(){
+  const newPass=prompt('أدخل كلمة المرور الجديدة:');
+  if(!newPass||newPass.trim().length<4){if(newPass!==null)alert('كلمة المرور يجب أن تكون 4 أحرف على الأقل');return;}
+  const confirm=prompt('أعد إدخال كلمة المرور الجديدة:');
+  if(newPass!==confirm){alert('كلمتا المرور غير متطابقتين!');return;}
+  const s=getSettings();s.adminPass=newPass;
+  localStorage.setItem(STK,JSON.stringify(s));
+  showToast('تم تغيير كلمة المرور ✅','ok');
+}
+
+// Override checkPass to use dynamic password
+function checkPass(){
+  const s=getSettings();
+  const pass=s.adminPass||'@Alhkaiah.20@';
+  if(document.getElementById('admin-pass').value===pass){
+    document.getElementById('admin-pass').value='';
+    showScreen('admin-screen');renderAdmin();
+  }else{showToast('كلمة المرور غير صحيحة','err');document.getElementById('admin-pass').value='';}
+}
+
 function showToast(msg,type){const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 
 // ===== INIT =====
+// Hide loading screen after init
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const ls=document.getElementById('loading-screen');
+    const app=document.getElementById('app');
+    if(ls){ls.style.opacity='0';setTimeout(()=>{ls.style.display='none';},500);}
+    if(app)app.style.opacity='1';
+  },800);
+});
+loadSavedTheme();
 if(window.location.hash==='#admin')setTimeout(goAdmin,400);
 cards=loadCards();subs=loadSubs();
 renderEditor();applyForm();
