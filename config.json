@@ -22,10 +22,10 @@
     "phone": true,
     "result": false,
     "answer": false,
-    "timer": false,
+    "timer": true,
     "locked": false,
     "lockMsg": "انتظرونا قريبا ",
-    "timerSecs": 30,
+    "timerSecs": 180,
     "finishMsg": "اللهم عجل لوليك الفرج",
     "msgStyle": {
       "color": "#c6bf9f",
