@@ -1,13 +1,13 @@
 {
   "customization": {
-    "scheme": "islamic",
+    "scheme": "slate",
     "homeBg": "#0f3d24",
     "btnColor": "#c27c2e",
     "appBg": "#f5f0e8",
     "logoBgColor": "#1a4a8a",
     "line1": "مسابقة",
     "line2": "دار سفوان القرآنية",
-    "line3": "الشهرية",
+    "line3": "السلام على من بكتهٌ ملائكةٌ السماء",
     "fontFamily": "Tajawal",
     "fontSize": 16,
     "imgSize": "140",
