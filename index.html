@@ -618,6 +618,10 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
           <div style="display:flex;gap:3px;justify-content:center;margin-bottom:6px"><div style="width:14px;height:14px;border-radius:50%;background:#065f46"></div><div style="width:14px;height:14px;border-radius:50%;background:#059669"></div><div style="width:14px;height:14px;border-radius:50%;background:#ecfdf5"></div></div>
           🌿 نعناعي
         </button>
+        <button onclick="applyScheme('gray')" id="sc-gray" style="border:2px solid #d4c5a0;border-radius:14px;padding:10px 6px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:700;background:#fff;color:#374151;transition:all .2s">
+          <div style="display:flex;gap:3px;justify-content:center;margin-bottom:6px"><div style="width:14px;height:14px;border-radius:50%;background:#374151"></div><div style="width:14px;height:14px;border-radius:50%;background:#6b7280"></div><div style="width:14px;height:14px;border-radius:50%;background:#f9fafb"></div></div>
+          ⚪ رمادي
+        </button>
       </div>
     </div>
     <div style="margin-bottom:16px">
@@ -1050,7 +1054,8 @@ const COLOR_SCHEMES = {
   indigo:{bg:'#eef2ff',card:'#ffffff',text:'#1e1b4b',border:'#c7d2fe',accent:'#4338ca',home1:'#312e81',home2:'#4338ca',home3:'#1e1b4b',btn:'linear-gradient(90deg,#4338ca,#818cf8,#312e81,#4338ca)'},
   coral:{bg:'#fff7ed',card:'#ffffff',text:'#7c2d12',border:'#fed7aa',accent:'#ea580c',home1:'#9a3412',home2:'#ea580c',home3:'#7c2d12',btn:'linear-gradient(90deg,#ea580c,#fb923c,#9a3412,#ea580c)'},
   charcoal:{bg:'#fafafa',card:'#ffffff',text:'#18181b',border:'#d4d4d8',accent:'#3f3f46',home1:'#18181b',home2:'#3f3f46',home3:'#09090b',btn:'linear-gradient(90deg,#3f3f46,#71717a,#18181b,#3f3f46)'},
-  mint:{bg:'#ecfdf5',card:'#ffffff',text:'#022c22',border:'#a7f3d0',accent:'#059669',home1:'#065f46',home2:'#059669',home3:'#022c22',btn:'linear-gradient(90deg,#059669,#34d399,#065f46,#059669)'}
+  mint:{bg:'#ecfdf5',card:'#ffffff',text:'#022c22',border:'#a7f3d0',accent:'#059669',home1:'#065f46',home2:'#059669',home3:'#022c22',btn:'linear-gradient(90deg,#059669,#34d399,#065f46,#059669)'},
+  gray:{bg:'#f9fafb',card:'#ffffff',text:'#1f2937',border:'#d1d5db',accent:'#6b7280',home1:'#374151',home2:'#6b7280',home3:'#1f2937',btn:'linear-gradient(90deg,#4b5563,#9ca3af,#374151,#4b5563)'}
 };
 
 function tintColor(hex,amount,toward){
@@ -1820,7 +1825,7 @@ injectBirdWatermarks();
 
 // ===== INIT =====
 // Load saved color scheme or default to islamic
-const _savedScheme=localStorage.getItem('fc_scheme')||'islamic';
+const _savedScheme=localStorage.getItem('fc_scheme')||'gray';
 applyScheme(_savedScheme,false);
 if(window.location.hash==='#admin')setTimeout(goAdmin,400);
 cards=loadCards();subs=loadSubs();
