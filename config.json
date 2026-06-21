@@ -7,7 +7,7 @@
     "logoBgColor": "#1a4a8a",
     "line1": "مسابقة",
     "line2": "دار سفوان القرآنية",
-    "line3": "السلام على من بكتهٌ ملائكةٌ السماء",
+    "line3": "الشهرية",
     "fontFamily": "Tajawal",
     "fontSize": 16,
     "imgSize": "140",
@@ -25,7 +25,7 @@
     "locked": false,
     "lockMsg": "انتظرونا قريبا ",
     "timerSecs": 90,
-    "finishMsg": "اللهم عجل لوليك الفرج",
+    "finishMsg": "السلام عليك يا اباعبدالله",
     "msgStyle": {
       "color": "#c6bf9f",
       "bg": "#1a1a2e",
