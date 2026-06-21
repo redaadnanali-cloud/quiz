@@ -1212,11 +1212,6 @@ async function loadConfig(){
     const sett=full.settings;
     if(sett){localStorage.setItem(STK,JSON.stringify(sett));}
     if(cfg.scheme && !localStorage.getItem('fc_scheme'))applyScheme(cfg.scheme);
-    if(cfg.appBg){document.documentElement.style.setProperty('--bg',cfg.appBg);}
-    if(cfg.cardColor){document.documentElement.style.setProperty('--card',cfg.cardColor);document.documentElement.style.setProperty('--s1',cfg.cardColor);}
-    if(cfg.textColor){document.documentElement.style.setProperty('--text',cfg.textColor);}
-    if(cfg.homeBg)document.getElementById('home-bg').style.background=`linear-gradient(160deg,${cfg.homeBg} 0%,${cfg.homeBg}cc 40%,${cfg.homeBg}99 100%)`;
-    if(cfg.btnColor)document.getElementById('main-btn').style.background=`linear-gradient(135deg,${cfg.btnColor},${cfg.btnColor}aa)`;
     if(cfg.logoBgColor)applyLogoCircle(cfg.logoBgColor);
     if(cfg.line1)document.getElementById('t1').textContent=cfg.line1;
     if(cfg.line2)document.getElementById('t2').textContent=cfg.line2;
