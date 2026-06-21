@@ -168,7 +168,7 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
 <div id="app" style="opacity:1">
 
 <!-- HOME -->
-<div id="home-screen" class="screen centered active" style="padding:0;position:relative;overflow:hidden">
+<div id="home-screen" class="screen centered active" style="padding:0;position:relative;overflow:hidden;opacity:0;transition:opacity .25s linear">
   <div id="home-bg" style="position:absolute;inset:0;background:linear-gradient(160deg,#0f3d24 0%,#1a5c38 40%,#1a3d20 100%)"></div>
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 20%,rgba(184,134,11,.08) 0%,transparent 65%)"></div>
   <svg class="geo-bg" xmlns="http://www.w3.org/2000/svg">
@@ -1836,7 +1836,10 @@ if(window.location.hash==='#admin')setTimeout(goAdmin,400);
 cards=loadCards();subs=loadSubs();
 if(cards.length)cardId=Math.max(cardId,...cards.map(c=>c.id||0));
 renderEditor();applyForm();
-loadConfig();fetchCards();
+function revealHome(){const hs=document.getElementById('home-screen');if(hs)hs.style.opacity='1';}
+loadConfig().finally(revealHome);
+setTimeout(revealHome,1800); // شبكة احتياطية في حال تعطّل/تأخّر الجلب
+fetchCards();
 </script>
 </body>
 </html>
