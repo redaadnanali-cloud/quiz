@@ -24,7 +24,7 @@
     "timer": true,
     "locked": false,
     "lockMsg": "انتظرونا قريبا ",
-    "timerSecs": 60,
+    "timerSecs": 90,
     "finishMsg": "اللهم عجل لوليك الفرج",
     "msgStyle": {
       "color": "#c6bf9f",

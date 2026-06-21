@@ -1060,7 +1060,8 @@ function tintColor(hex,amount,toward){
   r=Math.round(r+(toward[0]-r)*amount);g=Math.round(g+(toward[1]-g)*amount);b=Math.round(b+(toward[2]-b)*amount);
   return `rgb(${r},${g},${b})`;
 }
-function applyScheme(name){
+function applyScheme(name,persist){
+  if(persist===undefined)persist=true;
   const s=COLOR_SCHEMES[name]||COLOR_SCHEMES.islamic;
   const r=document.documentElement.style;
   // Light, mostly-white surfaces with just a touch of the chosen theme color
@@ -1117,7 +1118,7 @@ function applyScheme(name){
   const active=document.getElementById('sc-'+name);
   if(active){active.style.border='2.5px solid '+s.accent;active.style.boxShadow='0 0 0 3px '+s.accent+'33';}
   // Save
-  localStorage.setItem('fc_scheme',name);
+  if(persist)localStorage.setItem('fc_scheme',name);
 }
 
 // Legacy stubs (keep for save/load compatibility)
@@ -1820,7 +1821,7 @@ injectBirdWatermarks();
 // ===== INIT =====
 // Load saved color scheme or default to islamic
 const _savedScheme=localStorage.getItem('fc_scheme')||'islamic';
-applyScheme(_savedScheme);
+applyScheme(_savedScheme,false);
 if(window.location.hash==='#admin')setTimeout(goAdmin,400);
 cards=loadCards();subs=loadSubs();
 if(cards.length)cardId=Math.max(cardId,...cards.map(c=>c.id||0));
