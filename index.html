@@ -169,7 +169,7 @@ input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:po
 
 <!-- HOME -->
 <div id="home-screen" class="screen centered active" style="padding:0;position:relative;overflow:hidden">
-  <div id="home-bg" style="position:absolute;inset:0;background:linear-gradient(160deg,#0f3d24 0%,#1a5c38 40%,#1a3d20 100%);transition:background .4s"></div>
+  <div id="home-bg" style="position:absolute;inset:0;background:linear-gradient(160deg,#0f3d24 0%,#1a5c38 40%,#1a3d20 100%)"></div>
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 20%,rgba(184,134,11,.08) 0%,transparent 65%)"></div>
   <svg class="geo-bg" xmlns="http://www.w3.org/2000/svg">
     <defs><pattern id="geo" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
@@ -1098,7 +1098,10 @@ function applyScheme(name,persist){
   });
   // Home screen gradient
   const hbg=document.getElementById('home-bg');
-  if(hbg) hbg.style.background=`linear-gradient(160deg,${s.home1} 0%,${s.home2} 40%,${s.home3} 100%)`;
+  if(hbg){
+    hbg.style.transition=window._fcReady?'background .4s':'none';
+    hbg.style.background=`linear-gradient(160deg,${s.home1} 0%,${s.home2} 40%,${s.home3} 100%)`;
+  }
   // Quiz header bar gradient (matches home gradient colors)
   const qhb=document.getElementById('quiz-header-bar');
   if(qhb) qhb.style.background=`linear-gradient(135deg,${s.home1},${s.home2})`;
@@ -1203,7 +1206,7 @@ function exportConfig(){
 async function loadConfig(){
   try{
     const res=await fetch('config.json?v='+Date.now());
-    if(!res.ok)return;
+    if(!res.ok){window._fcReady=true;return;}
     const full=await res.json();
     const cfg=full.customization||{};
     const sett=full.settings;
@@ -1245,6 +1248,7 @@ async function loadConfig(){
     if(sett&&sett.thankyouText){try{document.getElementById('thankyou-text').value=sett.thankyouText;}catch(e){}}
     }catch(e){}
   }catch(e){}
+  finally{window._fcReady=true;}
 }
 
 // ===== CARDS =====
