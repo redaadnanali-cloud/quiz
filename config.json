@@ -4,7 +4,7 @@
     "homeBg": "#0f3d24",
     "btnColor": "#c27c2e",
     "appBg": "#f5f0e8",
-    "logoBgColor": "#65101d",
+    "logoBgColor": "#520509",
     "line1": "مسابقة",
     "line2": "دار سفوان القرآنية",
     "line3": "يابقية الله في ارضه",
@@ -25,7 +25,7 @@
     "locked": false,
     "lockMsg": "انتظرونا قريبا ",
     "timerSecs": 90,
-    "finishMsg": "السلام عليك يا اباعبدالله",
+    "finishMsg": "اللهم عجل لوليك الفرج",
     "msgStyle": {
       "color": "#c6bf9f",
       "bg": "#1a1a2e",
