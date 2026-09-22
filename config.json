@@ -7,7 +7,7 @@
     "logoBgColor": "#1a4a8a",
     "line1": "مسابقة",
     "line2": "دار سفوان القرآنية",
-    "line3": "يــافاطمـــــــــــــة الزهـــــــــــــراء",
+    "line3": "يافــــــــاطمة الزهــــــراء",
     "fontFamily": "Tajawal",
     "fontSize": 16,
     "imgSize": "140",
@@ -24,7 +24,7 @@
     "timer": true,
     "locked": false,
     "lockMsg": "انتظرونا قريبا ",
-    "timerSecs": 90,
+    "timerSecs": 300,
     "finishMsg": "اللهم عجل لوليك الفرج",
     "msgStyle": {
       "color": "#c6bf9f",
